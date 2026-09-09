@@ -15,8 +15,7 @@ export default defineConfig(({ mode }) => {
     env.VITE_SERVER_PROXY ||
     env.VITE_BACKEND_URL ||
     env.PROXY_TARGET ||
-    env.SERVER_PROXY ||
-    'http://127.0.0.1:8000'
+    env.SERVER_PROXY
 
   return {
     plugins: [
