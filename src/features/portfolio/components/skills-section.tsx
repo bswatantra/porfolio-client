@@ -1,5 +1,5 @@
-import { Loader2 } from 'lucide-react'
 import type { Skill } from '@/features/skills/schemas'
+import { Skeleton } from '@/components/ui/skeleton'
 import { SectionHeading } from './experience-section'
 
 const categoryMeta: Record<string, { label: string; color: string; bg: string }> = {
@@ -58,8 +58,30 @@ export function SkillsSection({
         />
 
         {isLoading && skills.length === 0 ? (
-          <div className='mt-14 flex items-center justify-center py-12'>
-            <Loader2 className='size-8 animate-spin text-primary' />
+          <div className='mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3'>
+            {[1, 2, 3, 4, 5, 6].map((idx) => (
+              <div
+                key={idx}
+                className='rounded-2xl border border-border/60 bg-card/50 p-5 backdrop-blur-sm'
+              >
+                {/* Category badge skeleton */}
+                <Skeleton className='mb-4 h-6 w-28 rounded-full' />
+
+                {/* Skill rows skeleton */}
+                <ul className='space-y-3'>
+                  {[1, 2, 3, 4].map((item) => (
+                    <li key={item} className='flex items-center justify-between gap-2'>
+                      <Skeleton className='h-4 w-28' />
+                      <div className='flex items-center gap-1'>
+                        {[1, 2, 3, 4, 5].map((dot) => (
+                          <Skeleton key={dot} className='h-1.5 w-1.5 rounded-full' />
+                        ))}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         ) : skills.length === 0 ? (
           <div className='mt-12 rounded-2xl border border-dashed border-border/70 p-12 text-center'>

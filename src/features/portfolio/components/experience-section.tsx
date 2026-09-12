@@ -1,8 +1,9 @@
-import { ArrowRight, Calendar, Loader2, MapPin } from 'lucide-react'
+import { ArrowRight, Calendar, MapPin } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import type { Experience } from '@/features/experiences/schemas'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 
 function formatDate(dateStr: string) {
   if (!dateStr) return 'Present'
@@ -46,8 +47,58 @@ export function ExperienceSection({
         />
 
         {isLoading && experiences.length === 0 ? (
-          <div className='mt-14 flex items-center justify-center py-12'>
-            <Loader2 className='size-8 animate-spin text-primary' />
+          <div className='relative mt-14'>
+            {/* Vertical timeline rail */}
+            <div className='absolute left-4 top-0 hidden h-full w-px bg-gradient-to-b from-primary/50 via-border to-transparent sm:block' />
+
+            <div className='space-y-8'>
+              {[1, 2, 3].map((idx) => (
+                <div key={idx} className='relative sm:pl-12'>
+                  {/* Timeline node skeleton */}
+                  <div className='absolute left-0 top-5 hidden sm:flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary/20 bg-background shadow-sm'>
+                    <Skeleton className='h-3 w-3 rounded-full' />
+                  </div>
+
+                  <div className='rounded-2xl border border-border/60 bg-card/50 p-6 shadow-sm backdrop-blur-sm'>
+                    {/* Header */}
+                    <div className='mb-4 flex flex-wrap items-start justify-between gap-3'>
+                      <div className='space-y-2'>
+                        <Skeleton className='h-5 w-44 sm:w-56' />
+                        <Skeleton className='h-4 w-32' />
+                      </div>
+                      <div className='flex flex-shrink-0 gap-2'>
+                        <Skeleton className='h-5 w-16 rounded-full' />
+                        <Skeleton className='h-5 w-20 rounded-full' />
+                      </div>
+                    </div>
+
+                    {/* Meta */}
+                    <div className='mb-4 flex flex-wrap gap-4'>
+                      <Skeleton className='h-3.5 w-36' />
+                      <Skeleton className='h-3.5 w-24' />
+                    </div>
+
+                    {/* Description */}
+                    <div className='mb-4 space-y-2'>
+                      <Skeleton className='h-4 w-full' />
+                      <Skeleton className='h-4 w-5/6' />
+                      <Skeleton className='h-4 w-3/4' />
+                    </div>
+
+                    {/* Skills + CTA */}
+                    <div className='flex flex-wrap items-center justify-between gap-3'>
+                      <div className='flex flex-wrap gap-1.5'>
+                        <Skeleton className='h-5 w-16 rounded-md' />
+                        <Skeleton className='h-5 w-20 rounded-md' />
+                        <Skeleton className='h-5 w-14 rounded-md' />
+                        <Skeleton className='h-5 w-24 rounded-md' />
+                      </div>
+                      <Skeleton className='h-7 w-20 rounded-full' />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : experiences.length === 0 ? (
           <div className='mt-12 rounded-2xl border border-dashed border-border/70 p-12 text-center'>

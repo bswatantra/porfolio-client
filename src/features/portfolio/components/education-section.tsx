@@ -1,6 +1,7 @@
-import { Calendar, GraduationCap, Loader2, MapPin } from 'lucide-react'
+import { Calendar, GraduationCap, MapPin } from 'lucide-react'
 import type { Education } from '@/features/education/schemas'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { SectionHeading } from './experience-section'
 
 function formatDate(dateStr: string) {
@@ -46,8 +47,40 @@ export function EducationSection({
         />
 
         {isLoading && education.length === 0 ? (
-          <div className='mt-14 flex items-center justify-center py-12'>
-            <Loader2 className='size-8 animate-spin text-primary' />
+          <div className='relative mt-14'>
+            <div className='absolute left-4 top-0 hidden h-full w-px bg-gradient-to-b from-primary/50 via-border to-transparent sm:block' />
+
+            <div className='space-y-8'>
+              {[1, 2].map((idx) => (
+                <div key={idx} className='relative sm:pl-12'>
+                  {/* Icon node skeleton */}
+                  <div className='absolute left-0 top-5 hidden sm:flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary/20 bg-background shadow-sm'>
+                    <Skeleton className='h-3.5 w-3.5 rounded-full' />
+                  </div>
+
+                  <div className='rounded-2xl border border-border/60 bg-card/50 p-6 backdrop-blur-sm'>
+                    <div className='mb-3 flex flex-wrap items-start justify-between gap-2'>
+                      <div className='space-y-1.5'>
+                        <Skeleton className='h-5 w-48 sm:w-64' />
+                        <Skeleton className='h-4 w-40' />
+                      </div>
+                      <Skeleton className='h-5 w-20 rounded-full' />
+                    </div>
+
+                    <div className='mb-4 flex flex-wrap gap-4'>
+                      <Skeleton className='h-3.5 w-32' />
+                      <Skeleton className='h-3.5 w-24' />
+                      <Skeleton className='h-3.5 w-20' />
+                    </div>
+
+                    <div className='space-y-2'>
+                      <Skeleton className='h-4 w-full' />
+                      <Skeleton className='h-4 w-5/6' />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : education.length === 0 ? (
           <div className='mt-12 rounded-2xl border border-dashed border-border/70 p-12 text-center'>

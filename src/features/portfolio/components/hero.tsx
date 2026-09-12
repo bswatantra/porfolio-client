@@ -5,6 +5,7 @@ import { IconGithub } from '@/assets/brand-icons'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { PortfolioOwner } from '../types'
 
 /* ── Typewriter ─────────────────────────────────────────────────── */
@@ -75,7 +76,73 @@ function TerminalChip({ text }: { text: string }) {
 }
 
 /* ── Hero ────────────────────────────────────────────────────────── */
-export function Hero({ owner }: { owner?: PortfolioOwner }) {
+export function Hero({
+  owner,
+  isLoading,
+}: {
+  owner?: PortfolioOwner
+  isLoading?: boolean
+}) {
+  if (isLoading) {
+    return (
+      <section
+        id='hero'
+        className='relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-28 text-center'
+      >
+        <GridBackground />
+
+        {/* Available badge skeleton */}
+        <Skeleton className='mb-8 h-8 w-52 rounded-full' />
+
+        {/* Name skeleton */}
+        <div className='mb-3 flex items-center justify-center gap-3'>
+          <Skeleton className='h-12 w-28 sm:h-16 sm:w-36' />
+          <Skeleton className='h-12 w-48 sm:h-16 sm:w-72' />
+        </div>
+
+        {/* Typewriter role skeleton */}
+        <Skeleton className='mb-6 h-8 w-64 max-w-full sm:h-9 sm:w-80' />
+
+        {/* Tagline skeleton */}
+        <div className='mb-8 flex max-w-2xl w-full flex-col items-center gap-2.5 px-4'>
+          <Skeleton className='h-4 w-full sm:w-5/6' />
+          <Skeleton className='h-4 w-4/5 sm:w-2/3' />
+        </div>
+
+        {/* Specializations skeleton */}
+        <div className='mb-8 flex flex-wrap justify-center gap-2'>
+          <Skeleton className='h-7 w-28 rounded-full' />
+          <Skeleton className='h-7 w-36 rounded-full' />
+          <Skeleton className='h-7 w-32 rounded-full' />
+          <Skeleton className='h-7 w-24 rounded-full' />
+        </div>
+
+        {/* Terminal chips skeleton */}
+        <div className='mb-10 flex flex-wrap justify-center gap-2'>
+          <Skeleton className='h-7 w-48 rounded-md' />
+          <Skeleton className='h-7 w-40 rounded-md' />
+          <Skeleton className='h-7 w-52 rounded-md' />
+        </div>
+
+        {/* Location skeleton */}
+        <Skeleton className='mb-8 h-5 w-36' />
+
+        {/* CTAs skeleton */}
+        <div className='flex flex-wrap justify-center gap-3'>
+          <Skeleton className='h-11 w-32 rounded-full' />
+          <Skeleton className='h-11 w-28 rounded-full' />
+          <Skeleton className='h-11 w-36 rounded-full' />
+        </div>
+
+        {/* Scroll cue skeleton */}
+        <div className='absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-50'>
+          <Skeleton className='h-3 w-8' />
+          <Skeleton className='h-4 w-4 rounded-full' />
+        </div>
+      </section>
+    )
+  }
+
   const roles = owner?.roles && owner.roles.length > 0 ? owner.roles : ['Developer']
   const specializations = owner?.specializations ?? []
   const terminalChips = owner?.terminalChips ?? []
@@ -203,7 +270,13 @@ export function Hero({ owner }: { owner?: PortfolioOwner }) {
 }
 
 /* ── Navbar ──────────────────────────────────────────────────────── */
-export function PortfolioNavbar({ owner }: { owner?: PortfolioOwner }) {
+export function PortfolioNavbar({
+  owner,
+  isLoading,
+}: {
+  owner?: PortfolioOwner
+  isLoading?: boolean
+}) {
   const sections = ['About', 'Experience', 'Projects', 'Skills', 'Education']
   const displayName = owner?.name || 'Portfolio'
   const initials = displayName
@@ -219,12 +292,21 @@ export function PortfolioNavbar({ owner }: { owner?: PortfolioOwner }) {
       <div className='mx-auto flex max-w-6xl items-center justify-between px-4 py-3'>
         {/* Logo */}
         <a href='#hero' className='flex items-center gap-2'>
-          <span className='flex h-7 w-7 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground'>
-            {initials || 'ME'}
-          </span>
-          <span className='hidden text-sm font-semibold sm:block'>
-            {displayName}
-          </span>
+          {isLoading ? (
+            <>
+              <Skeleton className='h-7 w-7 rounded-md' />
+              <Skeleton className='hidden h-4 w-24 sm:block' />
+            </>
+          ) : (
+            <>
+              <span className='flex h-7 w-7 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground'>
+                {initials || 'ME'}
+              </span>
+              <span className='hidden text-sm font-semibold sm:block'>
+                {displayName}
+              </span>
+            </>
+          )}
         </a>
 
         {/* Nav links */}

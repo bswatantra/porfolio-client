@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { AlertCircle, RefreshCw, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { EducationSection } from './components/education-section'
 import { ExperienceSection } from './components/experience-section'
 import { Hero, PortfolioNavbar } from './components/hero'
@@ -17,12 +18,54 @@ function AboutSection({
   about,
   projectsCount = 0,
   skillsCount = 0,
+  isLoading,
 }: {
   owner: PortfolioOwner
   about?: About | null
   projectsCount?: number
   skillsCount?: number
+  isLoading?: boolean
 }) {
+  if (isLoading) {
+    return (
+      <section id='about' className='py-24'>
+        <div className='mx-auto max-w-5xl px-4'>
+          <div className='grid items-center gap-12 lg:grid-cols-2'>
+            {/* Text skeleton */}
+            <div>
+              <Skeleton className='mb-3 h-6 w-24 rounded-full' />
+              <Skeleton className='mb-2 h-9 w-3/4 sm:w-5/6' />
+              <Skeleton className='mb-4 h-9 w-2/3' />
+              <div className='mb-6 space-y-2.5'>
+                <Skeleton className='h-4 w-full' />
+                <Skeleton className='h-4 w-11/12' />
+                <Skeleton className='h-4 w-4/5' />
+                <Skeleton className='h-4 w-2/3' />
+              </div>
+              <div className='flex flex-wrap gap-3'>
+                <Skeleton className='h-10 w-40 rounded-full' />
+                <Skeleton className='h-10 w-32 rounded-full' />
+              </div>
+            </div>
+
+            {/* Stats grid skeleton */}
+            <div className='grid grid-cols-2 gap-4'>
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className='flex flex-col items-center justify-center rounded-2xl border border-border/60 bg-card/50 p-6 text-center backdrop-blur-sm'
+                >
+                  <Skeleton className='mb-2 h-10 w-16' />
+                  <Skeleton className='h-4 w-28' />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   const displayStats = [
     {
       label: 'Years of Experience',
@@ -120,7 +163,33 @@ function AboutSection({
 }
 
 /* ── CTA banner ─────────────────────────────────────────────────── */
-function CTABanner({ owner }: { owner: PortfolioOwner }) {
+function CTABanner({
+  owner,
+  isLoading,
+}: {
+  owner: PortfolioOwner
+  isLoading?: boolean
+}) {
+  if (isLoading) {
+    return (
+      <section className='py-20'>
+        <div className='mx-auto max-w-3xl px-4 text-center'>
+          <div className='relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/5 via-violet-500/5 to-cyan-500/5 p-10 backdrop-blur-sm'>
+            <Skeleton className='mx-auto mb-3 h-9 w-72 max-w-full' />
+            <div className='mx-auto mb-8 max-w-xl space-y-2'>
+              <Skeleton className='mx-auto h-4 w-full' />
+              <Skeleton className='mx-auto h-4 w-3/4' />
+            </div>
+            <div className='flex flex-wrap justify-center gap-3'>
+              <Skeleton className='h-11 w-36 rounded-full' />
+              <Skeleton className='h-11 w-44 rounded-full' />
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   if (!owner.email && !owner.linkedin) return null
 
   return (
@@ -192,20 +261,20 @@ function Footer({ owner }: { owner: PortfolioOwner }) {
 
 /* ── Page ───────────────────────────────────────────────────────── */
 export function PortfolioPage() {
-  const { data, isLoading, isError, refetchAll } = usePortfolio()
+  const {
+    data,
+    isLoading,
+    isError,
+    refetchAll,
+    heroQuery,
+    aboutQuery,
+    experiencesQuery,
+    projectsQuery,
+    skillsQuery,
+    educationQuery,
+  } = usePortfolio()
 
-  if (isLoading) {
-    return (
-      <div className='flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center'>
-        <div className='relative mb-4 flex items-center justify-center'>
-          <div className='h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary' />
-        </div>
-        <p className='font-mono text-sm text-muted-foreground'>Loading portfolio data...</p>
-      </div>
-    )
-  }
-
-  if (isError) {
+  if (isError && !isLoading) {
     return (
       <div className='flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center'>
         <div className='mx-auto max-w-md space-y-4 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 backdrop-blur-sm'>
@@ -235,20 +304,21 @@ export function PortfolioPage() {
       {/* Dynamic SEO (Title, Meta, OG, Twitter, JSON-LD Schema) */}
       <PortfolioSEO data={data} />
 
-      <PortfolioNavbar owner={data.owner} />
+      <PortfolioNavbar owner={data.owner} isLoading={heroQuery.isLoading} />
       <main>
-        <Hero owner={data.owner} />
+        <Hero owner={data.owner} isLoading={heroQuery.isLoading} />
         <AboutSection
           owner={data.owner}
           about={data.about}
           projectsCount={data.about?.projectsCount ?? data.projects.length}
           skillsCount={data.about?.skillsCount ?? data.skills.length}
+          isLoading={aboutQuery.isLoading}
         />
-        <ExperienceSection experiences={data.experiences} isLoading={isLoading} />
-        <ProjectsSection projects={data.projects} isLoading={isLoading} />
-        <SkillsSection skills={data.skills} isLoading={isLoading} />
-        <EducationSection education={data.education} isLoading={isLoading} />
-        <CTABanner owner={data.owner} />
+        <ExperienceSection experiences={data.experiences} isLoading={experiencesQuery.isLoading} />
+        <ProjectsSection projects={data.projects} isLoading={projectsQuery.isLoading} />
+        <SkillsSection skills={data.skills} isLoading={skillsQuery.isLoading} />
+        <EducationSection education={data.education} isLoading={educationQuery.isLoading} />
+        <CTABanner owner={data.owner} isLoading={heroQuery.isLoading || aboutQuery.isLoading} />
       </main>
       <Footer owner={data.owner} />
     </div>

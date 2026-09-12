@@ -1,9 +1,10 @@
-import { ArrowRight, ExternalLink, Loader2, Star } from 'lucide-react'
+import { ArrowRight, ExternalLink, Star } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { IconGithub } from '@/assets/brand-icons'
 import type { Project } from '@/features/projects/schemas'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { SectionHeading } from './experience-section'
 
 const categoryMeta: Record<string, { label: string; color: string; glow: string }> = {
@@ -42,8 +43,18 @@ export function ProjectsSection({
         />
 
         {isLoading && projects.length === 0 ? (
-          <div className='mt-14 flex items-center justify-center py-12'>
-            <Loader2 className='size-8 animate-spin text-primary' />
+          <div className='mt-14 space-y-6'>
+            {/* Featured skeleton cards */}
+            <div className='grid gap-6 md:grid-cols-2'>
+              <ProjectCardSkeleton featured />
+              <ProjectCardSkeleton featured />
+            </div>
+            {/* Compact skeleton cards */}
+            <div className='grid gap-5 sm:grid-cols-2 lg:grid-cols-3'>
+              <ProjectCardSkeleton />
+              <ProjectCardSkeleton />
+              <ProjectCardSkeleton />
+            </div>
           </div>
         ) : (
           <>
@@ -74,6 +85,52 @@ export function ProjectsSection({
         )}
       </div>
     </section>
+  )
+}
+
+function ProjectCardSkeleton({ featured = false }: { featured?: boolean }) {
+  return (
+    <div className='relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/60 backdrop-blur-sm'>
+      {/* Top accent line */}
+      <Skeleton className='h-1.5 w-full rounded-none' />
+
+      {/* Thumbnail / placeholder */}
+      <Skeleton className={`w-full rounded-none ${featured ? 'h-44' : 'h-28'}`} />
+
+      <div className='flex flex-1 flex-col p-5'>
+        {/* Badges */}
+        <div className='mb-3 flex flex-wrap items-center gap-2'>
+          <Skeleton className='h-5 w-16 rounded-full' />
+          <Skeleton className='h-5 w-20 rounded-full' />
+          {featured && <Skeleton className='h-5 w-20 rounded-full' />}
+        </div>
+
+        {/* Title + Tagline */}
+        <Skeleton className='mb-1.5 h-5 w-3/4' />
+        <Skeleton className='mb-3 h-3.5 w-1/2' />
+
+        {/* Description */}
+        <div className='mb-4 flex-1 space-y-2'>
+          <Skeleton className='h-4 w-full' />
+          <Skeleton className='h-4 w-5/6' />
+          <Skeleton className='h-4 w-2/3' />
+        </div>
+
+        {/* Tech stack */}
+        <div className='mb-4 flex flex-wrap gap-1.5'>
+          <Skeleton className='h-5 w-14 rounded-md' />
+          <Skeleton className='h-5 w-16 rounded-md' />
+          <Skeleton className='h-5 w-12 rounded-md' />
+          <Skeleton className='h-5 w-16 rounded-md' />
+        </div>
+
+        {/* Links / Buttons */}
+        <div className='flex flex-wrap items-center gap-2'>
+          <Skeleton className='h-8 w-24 rounded-full' />
+          <Skeleton className='h-8 w-20 rounded-full' />
+        </div>
+      </div>
+    </div>
   )
 }
 
