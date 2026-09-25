@@ -55,7 +55,11 @@ export function BlogRowActions({
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link to='/manage-blogs/$blogId' params={{ blogId: blog.id }}>
+          <Link
+            to='/manage-blogs/$blogId'
+            params={{ blogId: blog.id }}
+            startTransition
+          >
             <Edit3 className='mr-2 h-4 w-4' />
             Edit Article
           </Link>

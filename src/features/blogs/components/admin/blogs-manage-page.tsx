@@ -152,7 +152,7 @@ export function BlogsManagePage() {
             </Button>
 
             <Button asChild size='sm' className='gap-1.5 text-xs'>
-              <Link to='/manage-blogs/new'>
+              <Link to='/manage-blogs/new' startTransition>
                 <Plus className='h-3.5 w-3.5' />
                 New Blog Post
               </Link>
@@ -401,6 +401,7 @@ export function BlogsManagePage() {
                           <Link
                             to='/manage-blogs/$blogId'
                             params={{ blogId: blog.id }}
+                            startTransition
                           >
                             <Edit3 className='h-4 w-4' />
                             <span className='sr-only'>Edit Article</span>

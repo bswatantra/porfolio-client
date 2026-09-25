@@ -572,7 +572,7 @@ export function BlogForm({
       <div className='flex flex-wrap items-center justify-between gap-4'>
         <div className='flex items-center gap-3'>
           <Button asChild variant='ghost' size='sm' className='gap-2'>
-            <Link to='/manage-blogs'>
+            <Link to='/manage-blogs' startTransition>
               <ArrowLeft className='h-4 w-4' />
               Back to Blogs
             </Link>
@@ -1403,7 +1403,7 @@ export function BlogForm({
 
                   <div className='flex items-center gap-2'>
                     <Button variant='outline' asChild size='sm'>
-                      <Link to='/manage-blogs'>Cancel</Link>
+                      <Link to='/manage-blogs' startTransition>Cancel</Link>
                     </Button>
                     <Button
                       type='submit'
