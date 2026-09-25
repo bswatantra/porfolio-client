@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import {
   ArrowLeft,
@@ -39,9 +39,12 @@ interface BlogDetailProps {
   isPreview?: boolean
 }
 
-export function BlogDetail({ blog, isPreview = false }: BlogDetailProps) {
+export const BlogDetail = React.memo(function BlogDetail({
+  blog,
+  isPreview = false,
+}: BlogDetailProps) {
   const [copiedLink, setCopiedLink] = useState(false)
-  const { data: allBlogs = [] } = useGetBlogsQuery()
+  const { data: allBlogs = [] } = useGetBlogsQuery(undefined, { enabled: !isPreview })
   const relatedBlogs: Blog[] = (allBlogs || [])
     .filter((b: Blog) => b.id !== blog.id && b.slug !== blog.slug)
     .slice(0, 2)
@@ -309,4 +312,4 @@ export function BlogDetail({ blog, isPreview = false }: BlogDetailProps) {
       )}
     </div>
   )
-}
+})

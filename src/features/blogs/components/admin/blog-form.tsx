@@ -1,5 +1,11 @@
-import { useRef, useState } from 'react'
-import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import React, {
+  useDeferredValue,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react'
+import { useFieldArray, useForm, useWatch, type Control } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
@@ -103,12 +109,125 @@ interface BlogFormProps {
   mode?: 'create' | 'edit'
 }
 
+interface BlogLivePreviewPaneProps {
+  control: Control<BlogFormData>
+  editorMode: 'markdown' | 'sections'
+  initialData?: Blog
+  viewMode: 'edit' | 'split' | 'preview'
+  onClosePreview?: () => void
+}
+
+const BlogLivePreviewPane = React.memo(function BlogLivePreviewPane({
+  control,
+  editorMode,
+  initialData,
+  viewMode,
+  onClosePreview,
+}: BlogLivePreviewPaneProps) {
+  const watchedValues = useWatch({ control })
+  const deferredValues = useDeferredValue(watchedValues)
+
+  const previewBlog: Blog = useMemo(() => {
+    const sections = (deferredValues.sections?.map((s) => ({
+      heading: s.heading || 'Section Heading',
+      body: s.body || 'Section content...',
+      codeSnippet: s.codeSnippet
+        ? {
+            language: s.codeLanguage || 'typescript',
+            code: s.codeSnippet,
+          }
+        : undefined,
+    })) || []) as BlogSection[]
+
+    const content =
+      editorMode === 'markdown'
+        ? deferredValues.content || ''
+        : sectionsToMarkdown(
+            (deferredValues.sections || []).map((s) => ({
+              heading: s.heading || 'Heading',
+              body: s.body || '',
+              codeSnippet: s.codeSnippet
+                ? {
+                    language: s.codeLanguage || 'typescript',
+                    code: s.codeSnippet,
+                  }
+                : undefined,
+            }))
+          )
+
+    return {
+      id: initialData?.id || 'preview-temp-id',
+      slug: deferredValues.slug || 'preview-slug',
+      title: deferredValues.title || 'Untitled Blog Post',
+      excerpt: deferredValues.excerpt || 'Article summary will appear here...',
+      category: deferredValues.category || 'General',
+      readTime: deferredValues.readTime || '5 min read',
+      publishedAt: initialData?.publishedAt || 'Today',
+      coverImage:
+        deferredValues.coverImage ||
+        'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
+      featured: deferredValues.featured,
+      tags: (deferredValues.tags || '')
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean),
+      author: {
+        name: deferredValues.authorName || 'Author',
+        role: deferredValues.authorRole,
+        avatarUrl: deferredValues.authorAvatarUrl,
+      },
+      content,
+      sections,
+    }
+  }, [initialData?.id, initialData?.publishedAt, deferredValues, editorMode])
+
+  return (
+    <div
+      className={
+        viewMode === 'split'
+          ? 'sticky top-16 flex h-[calc(100vh-5.5rem)] flex-col overflow-hidden rounded-2xl border border-border/80 bg-background shadow-lg lg:col-span-1'
+          : 'overflow-hidden rounded-2xl border border-border/80 bg-background shadow-lg'
+      }
+    >
+      <div className='flex shrink-0 items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-2.5'>
+        <div className='flex items-center gap-2'>
+          <Badge
+            variant='outline'
+            className='bg-primary/10 text-primary border-primary/20 text-xs'
+          >
+            Live Preview
+          </Badge>
+          <span className='text-xs text-muted-foreground'>
+            Markdown & code blocks render in real-time
+          </span>
+        </div>
+        {viewMode === 'preview' && onClosePreview && (
+          <Button
+            size='sm'
+            variant='outline'
+            className='h-7 text-xs'
+            onClick={onClosePreview}
+          >
+            <FileEdit className='h-3.5 w-3.5 mr-1 pointer-events-none' />
+            <span className='pointer-events-none'>Back to Editor</span>
+          </Button>
+        )}
+      </div>
+
+      <div className='flex-1 overflow-y-auto p-4 sm:p-6'>
+        <BlogDetail blog={previewBlog} isPreview />
+      </div>
+    </div>
+  )
+})
+
 export function BlogForm({
   initialData,
   mode = initialData ? 'edit' : 'create',
 }: BlogFormProps) {
   const navigate = useNavigate()
   const isEdit = mode === 'edit'
+  const [, startModeTransition] = useTransition()
   const [viewMode, setViewMode] = useState<'edit' | 'split' | 'preview'>('edit')
   const [editorMode, setEditorMode] = useState<'markdown' | 'sections'>(
     initialData?.content ? 'markdown' : 'markdown'
@@ -212,58 +331,6 @@ export function BlogForm({
     name: 'sections',
   })
 
-  // Watch values for real-time live preview
-  const watchedValues = useWatch({ control: form.control })
-
-  // Construct a preview blog object from current form values
-  const previewBlog: Blog = {
-    id: initialData?.id || 'preview-temp-id',
-    slug: watchedValues.slug || 'preview-slug',
-    title: watchedValues.title || 'Untitled Blog Post',
-    excerpt: watchedValues.excerpt || 'Article summary will appear here...',
-    category: watchedValues.category || 'General',
-    readTime: watchedValues.readTime || '5 min read',
-    publishedAt: initialData?.publishedAt || 'Today',
-    coverImage:
-      watchedValues.coverImage ||
-      'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
-    featured: watchedValues.featured,
-    tags: (watchedValues.tags || '')
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean),
-    author: {
-      name: watchedValues.authorName || 'Author',
-      role: watchedValues.authorRole,
-      avatarUrl: watchedValues.authorAvatarUrl,
-    },
-    content:
-      editorMode === 'markdown'
-        ? watchedValues.content
-        : sectionsToMarkdown(
-            watchedValues.sections?.map((s) => ({
-              heading: s.heading || 'Heading',
-              body: s.body || '',
-              codeSnippet: s.codeSnippet
-                ? {
-                    language: s.codeLanguage || 'typescript',
-                    code: s.codeSnippet,
-                  }
-                : undefined,
-            }))
-          ),
-    sections: watchedValues.sections?.map((s) => ({
-      heading: s.heading || 'Section Heading',
-      body: s.body || 'Section content...',
-      codeSnippet: s.codeSnippet
-        ? {
-            language: s.codeLanguage || 'typescript',
-            code: s.codeSnippet,
-          }
-        : undefined,
-    })) as BlogSection[],
-  }
-
   // Auto-generate slug from title
   const handleGenerateSlug = () => {
     const title = form.getValues('title')
@@ -297,41 +364,44 @@ export function BlogForm({
   const handleSwitchEditorMode = (newMode: 'markdown' | 'sections') => {
     if (newMode === editorMode) return
 
-    if (newMode === 'markdown') {
-      // Convert current sections to markdown text
-      const currentSections = form.getValues('sections')
-      const formattedSections: BlogSection[] = currentSections.map((s) => ({
-        heading: s.heading,
-        body: s.body,
-        codeSnippet: s.codeSnippet
-          ? {
-              language: s.codeLanguage || 'typescript',
-              code: s.codeSnippet,
-            }
-          : undefined,
-      }))
-      const md = sectionsToMarkdown(formattedSections)
-      form.setValue('content', md)
-      form.setValue('editorMode', 'markdown')
-      setEditorMode('markdown')
-      toast.info('Switched to Markdown (.md) editor')
-    } else {
-      // Convert current markdown to sections
-      const currentMd = form.getValues('content')
-      const parsedSections = markdownToSections(currentMd)
-      form.setValue(
-        'sections',
-        parsedSections.map((s) => ({
+    startModeTransition(() => {
+      if (newMode === 'markdown') {
+        // Convert current sections to markdown text
+        const currentSections = form.getValues('sections')
+        const formattedSections: BlogSection[] = currentSections.map((s) => ({
           heading: s.heading,
           body: s.body,
-          codeLanguage: s.codeSnippet?.language || '',
-          codeSnippet: s.codeSnippet?.code || '',
+          codeSnippet: s.codeSnippet
+            ? {
+                language: s.codeLanguage || 'typescript',
+                code: s.codeSnippet,
+              }
+            : undefined,
         }))
-      )
-      form.setValue('editorMode', 'sections')
-      setEditorMode('sections')
-      toast.info('Switched to Structured Sections editor')
-    }
+        const md = sectionsToMarkdown(formattedSections)
+        form.setValue('content', md, { shouldValidate: false, shouldDirty: true })
+        form.setValue('editorMode', 'markdown', { shouldValidate: false })
+        setEditorMode('markdown')
+        toast.info('Switched to Markdown (.md) editor')
+      } else {
+        // Convert current markdown to sections
+        const currentMd = form.getValues('content') || ''
+        const parsedSections = markdownToSections(currentMd)
+        form.setValue(
+          'sections',
+          parsedSections.map((s) => ({
+            heading: s.heading,
+            body: s.body,
+            codeLanguage: s.codeSnippet?.language || '',
+            codeSnippet: s.codeSnippet?.code || '',
+          })),
+          { shouldValidate: false, shouldDirty: true }
+        )
+        form.setValue('editorMode', 'sections', { shouldValidate: false })
+        setEditorMode('sections')
+        toast.info('Switched to Structured Sections editor')
+      }
+    })
   }
 
   // Insert markdown snippet into content
@@ -527,30 +597,30 @@ export function BlogForm({
               variant={viewMode === 'edit' ? 'default' : 'ghost'}
               size='sm'
               className='h-8 gap-1.5 text-xs'
-              onClick={() => setViewMode('edit')}
+              onClick={() => startModeTransition(() => setViewMode('edit'))}
             >
-              <FileEdit className='h-3.5 w-3.5' />
-              Editor
+              <FileEdit className='h-3.5 w-3.5 pointer-events-none' />
+              <span className='pointer-events-none'>Editor</span>
             </Button>
             <Button
               type='button'
               variant={viewMode === 'split' ? 'default' : 'ghost'}
               size='sm'
               className='h-8 gap-1.5 text-xs hidden lg:flex'
-              onClick={() => setViewMode('split')}
+              onClick={() => startModeTransition(() => setViewMode('split'))}
             >
-              <Split className='h-3.5 w-3.5' />
-              Split View
+              <Split className='h-3.5 w-3.5 pointer-events-none' />
+              <span className='pointer-events-none'>Split View</span>
             </Button>
             <Button
               type='button'
               variant={viewMode === 'preview' ? 'default' : 'ghost'}
               size='sm'
               className='h-8 gap-1.5 text-xs'
-              onClick={() => setViewMode('preview')}
+              onClick={() => startModeTransition(() => setViewMode('preview'))}
             >
-              <Eye className='h-3.5 w-3.5' />
-              Full Preview
+              <Eye className='h-3.5 w-3.5 pointer-events-none' />
+              <span className='pointer-events-none'>Full Preview</span>
             </Button>
           </div>
         </div>
@@ -735,20 +805,20 @@ export function BlogForm({
                               variant={coverMode === 'upload' ? 'default' : 'ghost'}
                               size='sm'
                               className='h-7 px-2.5 text-xs gap-1.5'
-                              onClick={() => setCoverMode('upload')}
+                              onClick={() => startModeTransition(() => setCoverMode('upload'))}
                             >
-                              <CloudUpload className='h-3.5 w-3.5' />
-                              <span>Cloud Upload</span>
+                              <CloudUpload className='h-3.5 w-3.5 pointer-events-none' />
+                              <span className='pointer-events-none'>Cloud Upload</span>
                             </Button>
                             <Button
                               type='button'
                               variant={coverMode === 'url' ? 'default' : 'ghost'}
                               size='sm'
                               className='h-7 px-2.5 text-xs gap-1.5'
-                              onClick={() => setCoverMode('url')}
+                              onClick={() => startModeTransition(() => setCoverMode('url'))}
                             >
-                              <ImageIcon className='h-3.5 w-3.5' />
-                              <span>Image URL</span>
+                              <ImageIcon className='h-3.5 w-3.5 pointer-events-none' />
+                              <span className='pointer-events-none'>Image URL</span>
                             </Button>
                           </div>
                         </div>
@@ -1055,8 +1125,8 @@ export function BlogForm({
                         className='h-7 text-xs gap-1'
                         onClick={() => handleSwitchEditorMode('markdown')}
                       >
-                        <FileCode className='h-3.5 w-3.5' />
-                        .md Editor
+                        <FileCode className='h-3.5 w-3.5 pointer-events-none' />
+                        <span className='pointer-events-none'>.md Editor</span>
                       </Button>
                       <Button
                         type='button'
@@ -1065,7 +1135,7 @@ export function BlogForm({
                         className='h-7 text-xs gap-1'
                         onClick={() => handleSwitchEditorMode('sections')}
                       >
-                        Sections
+                        <span className='pointer-events-none'>Sections</span>
                       </Button>
                     </div>
                   </div>
@@ -1350,42 +1420,13 @@ export function BlogForm({
 
         {/* Live Preview Side (Split View or Full Preview) */}
         {(viewMode === 'split' || viewMode === 'preview') && (
-          <div
-            className={
-              viewMode === 'split'
-                ? 'sticky top-16 flex h-[calc(100vh-5.5rem)] flex-col overflow-hidden rounded-2xl border border-border/80 bg-background shadow-lg lg:col-span-1'
-                : 'overflow-hidden rounded-2xl border border-border/80 bg-background shadow-lg'
-            }
-          >
-            <div className='flex shrink-0 items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-2.5'>
-              <div className='flex items-center gap-2'>
-                <Badge
-                  variant='outline'
-                  className='bg-primary/10 text-primary border-primary/20 text-xs'
-                >
-                  Live Preview
-                </Badge>
-                <span className='text-xs text-muted-foreground'>
-                  Markdown & code blocks render in real-time
-                </span>
-              </div>
-              {viewMode === 'preview' && (
-                <Button
-                  size='sm'
-                  variant='outline'
-                  className='h-7 text-xs'
-                  onClick={() => setViewMode('edit')}
-                >
-                  <FileEdit className='h-3.5 w-3.5 mr-1' />
-                  Back to Editor
-                </Button>
-              )}
-            </div>
-
-            <div className='flex-1 overflow-y-auto p-4 sm:p-6'>
-              <BlogDetail blog={previewBlog} isPreview />
-            </div>
-          </div>
+          <BlogLivePreviewPane
+            control={form.control}
+            editorMode={editorMode}
+            initialData={initialData}
+            viewMode={viewMode}
+            onClosePreview={() => startModeTransition(() => setViewMode('edit'))}
+          />
         )}
       </div>
     </div>

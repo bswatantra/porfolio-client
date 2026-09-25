@@ -98,11 +98,15 @@ export async function uploadBlogCover(file: File): Promise<{ url: string; filena
 
 // React Query Hooks
 
-export function useGetBlogsQuery(params?: BlogFilterParams) {
+export function useGetBlogsQuery(
+  params?: BlogFilterParams,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ['blogs', params],
     queryFn: () => fetchBlogs(params),
     staleTime: 1000 * 30, // 30 seconds
+    enabled: options?.enabled ?? true,
   })
 }
 

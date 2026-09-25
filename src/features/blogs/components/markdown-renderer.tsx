@@ -15,7 +15,13 @@ interface MarkdownRendererProps {
   content: string
 }
 
-function CodeBlock({ language, code }: { language: string; code: string }) {
+const CodeBlock = React.memo(function CodeBlock({
+  language,
+  code,
+}: {
+  language: string
+  code: string
+}) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -59,7 +65,7 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
       </pre>
     </div>
   )
-}
+})
 
 function parseInlineFormatting(text: string): React.ReactNode {
   // Regex parsing inline: bold, italic, code, link, image
@@ -172,7 +178,9 @@ function parseInlineFormatting(text: string): React.ReactNode {
   return <>{elements}</>
 }
 
-export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+export const MarkdownRenderer = React.memo(function MarkdownRenderer({
+  content,
+}: MarkdownRendererProps) {
   if (!content) return null
 
   const lines = content.split('\n')
@@ -463,4 +471,4 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   }
 
   return <div className='markdown-content space-y-1'>{blocks}</div>
-}
+})
