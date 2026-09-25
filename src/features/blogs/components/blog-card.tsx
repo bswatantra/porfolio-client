@@ -76,7 +76,7 @@ export function BlogCard({ blog, featuredHero = false }: BlogCardProps) {
               </div>
 
               <h3 className='mt-3 text-xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary sm:text-2xl lg:text-3xl'>
-                <Link to='/blogs/$blogId' params={{ blogId: blog.slug }}>
+                <Link to='/blogs/$blogId' params={{ blogId: blog.slug || blog.id }}>
                   {blog.title}
                 </Link>
               </h3>
@@ -121,7 +121,7 @@ export function BlogCard({ blog, featuredHero = false }: BlogCardProps) {
 
               <Link
                 to='/blogs/$blogId'
-                params={{ blogId: blog.slug }}
+                params={{ blogId: blog.slug || blog.id }}
                 className='inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-transform group-hover:translate-x-1'
               >
                 Read Article
@@ -177,7 +177,7 @@ export function BlogCard({ blog, featuredHero = false }: BlogCardProps) {
 
           {/* Title */}
           <h3 className='mt-2.5 text-lg font-bold leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary line-clamp-2'>
-            <Link to='/blogs/$blogId' params={{ blogId: blog.slug }}>
+            <Link to='/blogs/$blogId' params={{ blogId: blog.slug || blog.id }}>
               {blog.title}
             </Link>
           </h3>
@@ -216,7 +216,7 @@ export function BlogCard({ blog, featuredHero = false }: BlogCardProps) {
 
           <Link
             to='/blogs/$blogId'
-            params={{ blogId: blog.slug }}
+            params={{ blogId: blog.slug || blog.id }}
             className='inline-flex items-center gap-1 text-xs font-medium text-primary transition-transform group-hover:translate-x-1'
           >
             Read

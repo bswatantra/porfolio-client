@@ -442,6 +442,7 @@ export function BlogForm({
           }))
 
     if (isEdit && initialData) {
+      let apiSuccess = false
       try {
         await updateBlogMutation.mutateAsync({
           id: initialData.id,
@@ -461,8 +462,11 @@ export function BlogForm({
             authorAvatarUrl: data.authorAvatarUrl,
           },
         })
-      } catch (err) {
-        console.warn('Backend API update failed, persisting to local store:', err)
+        apiSuccess = true
+      } catch (err: any) {
+        console.warn('Backend API update failed:', err)
+        const errorDetail = err?.response?.data?.detail || err?.message || 'Database update failed'
+        toast.error(`Database error: ${errorDetail}. Updated only in local cache.`)
       }
 
       updateBlog(initialData.id, {
@@ -482,10 +486,14 @@ export function BlogForm({
         },
         sections: finalSections,
       })
-      toast.success(`"${data.title}" updated successfully!`)
+
+      if (apiSuccess) {
+        toast.success(`"${data.title}" updated successfully!`)
+      }
     } else {
+      let createdDoc: Blog | null = null
       try {
-        await createBlogMutation.mutateAsync({
+        createdDoc = await createBlogMutation.mutateAsync({
           title: data.title,
           slug: data.slug,
           excerpt: data.excerpt,
@@ -500,12 +508,15 @@ export function BlogForm({
           authorRole: data.authorRole,
           authorAvatarUrl: data.authorAvatarUrl,
         })
-      } catch (err) {
-        console.warn('Backend API create failed, persisting to local store:', err)
+      } catch (err: any) {
+        console.warn('Backend API create failed:', err)
+        const errorDetail = err?.response?.data?.detail || err?.message || 'Database save failed'
+        toast.error(`Database error: ${errorDetail}. Saved only to local browser cache.`)
       }
 
       addBlog({
-        slug: data.slug,
+        ...(createdDoc?.id ? { id: createdDoc.id } : {}),
+        slug: createdDoc?.slug || data.slug,
         title: data.title,
         excerpt: data.excerpt,
         category: data.category,
@@ -526,7 +537,10 @@ export function BlogForm({
         },
         sections: finalSections,
       })
-      toast.success(`"${data.title}" created successfully!`)
+
+      if (createdDoc) {
+        toast.success(`"${data.title}" created and saved to database!`)
+      }
     }
 
     navigate({ to: '/manage-blogs' })

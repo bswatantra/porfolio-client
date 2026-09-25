@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   BookOpen,
   Filter,
+  Loader2,
   Search,
   Sparkles,
   X,
@@ -13,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BlogCard } from './blog-card'
+import { useGetBlogsQuery } from '../api/blogs-api'
 import { useBlogStore } from '../data/blogs-store'
 
 const CATEGORIES = [
@@ -25,7 +27,14 @@ const CATEGORIES = [
 ] as const
 
 export function BlogsList() {
-  const allBlogs = useBlogStore((state) => state.blogs)
+  const { data: apiBlogs, isLoading } = useGetBlogsQuery()
+  const localBlogs = useBlogStore((state) => state.blogs)
+
+  // Prioritize API blogs from backend MongoDB; fall back to local store if API empty
+  const allBlogs = useMemo(() => {
+    if (apiBlogs && apiBlogs.length > 0) return apiBlogs
+    return localBlogs
+  }, [apiBlogs, localBlogs])
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -207,7 +216,12 @@ export function BlogsList() {
             )}
           </div>
 
-          {filteredBlogs.length === 0 ? (
+          {isLoading && allBlogs.length === 0 ? (
+            <div className='flex min-h-[260px] flex-col items-center justify-center gap-3'>
+              <Loader2 className='h-8 w-8 animate-spin text-primary' />
+              <p className='text-sm text-muted-foreground'>Loading articles...</p>
+            </div>
+          ) : filteredBlogs.length === 0 ? (
             <div className='flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-16 text-center'>
               <BookOpen className='h-12 w-12 text-muted-foreground/40' />
               <h3 className='mt-4 text-base font-semibold'>
