@@ -1,6 +1,7 @@
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/confirm-dialog'
-import { useBlogStore } from '../../data/blogs-store'
+import { handleServerError } from '@/lib/handle-server-error'
+import { useDeleteBlogMutation } from '../../api/blogs-api'
 import type { Blog } from '../../types'
 
 interface BlogDeleteDialogProps {
@@ -16,14 +17,18 @@ export function BlogDeleteDialog({
   onOpenChange,
   onSuccess,
 }: BlogDeleteDialogProps) {
-  const deleteBlog = useBlogStore((state) => state.deleteBlog)
+  const deleteBlogMutation = useDeleteBlogMutation()
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!blog) return
-    deleteBlog(blog.id)
-    toast.success(`"${blog.title}" was deleted.`)
-    onOpenChange(false)
-    onSuccess?.()
+    try {
+      await deleteBlogMutation.mutateAsync(blog.id)
+      toast.success(`"${blog.title}" was permanently deleted from the database.`)
+      onOpenChange(false)
+      onSuccess?.()
+    } catch (err) {
+      handleServerError(err)
+    }
   }
 
   if (!blog) return null
@@ -33,6 +38,7 @@ export function BlogDeleteDialog({
       open={open}
       onOpenChange={onOpenChange}
       destructive
+      isLoading={deleteBlogMutation.isPending}
       handleConfirm={handleDelete}
       className='max-w-md'
       title={`Delete "${blog.title}"?`}

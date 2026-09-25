@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BlogCard } from './blog-card'
 import { useGetBlogsQuery } from '../api/blogs-api'
-import { useBlogStore } from '../data/blogs-store'
 
 const CATEGORIES = [
   'All',
@@ -27,14 +26,7 @@ const CATEGORIES = [
 ] as const
 
 export function BlogsList() {
-  const { data: apiBlogs, isLoading } = useGetBlogsQuery()
-  const localBlogs = useBlogStore((state) => state.blogs)
-
-  // Prioritize API blogs from backend MongoDB; fall back to local store if API empty
-  const allBlogs = useMemo(() => {
-    if (apiBlogs && apiBlogs.length > 0) return apiBlogs
-    return localBlogs
-  }, [apiBlogs, localBlogs])
+  const { data: allBlogs = [], isLoading } = useGetBlogsQuery()
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState('')
 

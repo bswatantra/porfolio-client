@@ -27,6 +27,7 @@ import {
   X,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { handleServerError } from '@/lib/handle-server-error'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -61,7 +62,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useBlogStore } from '../../data/blogs-store'
 import {
   blogFormSchema,
   type BlogFormData,
@@ -118,8 +118,6 @@ export function BlogForm({
   const [coverMode, setCoverMode] = useState<'upload' | 'url'>('url')
   const [isUploadingCover, setIsUploadingCover] = useState(false)
 
-  const addBlog = useBlogStore((state) => state.addBlog)
-  const updateBlog = useBlogStore((state) => state.updateBlog)
   const createBlogMutation = useCreateBlogMutation()
   const updateBlogMutation = useUpdateBlogMutation()
 
@@ -135,10 +133,8 @@ export function BlogForm({
         form.setValue('coverImage', res.url, { shouldValidate: true })
         toast.success('Cover image uploaded successfully to cloud storage!')
       }
-    } catch (err: any) {
-      toast.error(
-        err?.response?.data?.detail || 'Failed to upload cover image. Please try again.'
-      )
+    } catch (err) {
+      handleServerError(err)
     } finally {
       setIsUploadingCover(false)
     }
@@ -442,7 +438,6 @@ export function BlogForm({
           }))
 
     if (isEdit && initialData) {
-      let apiSuccess = false
       try {
         await updateBlogMutation.mutateAsync({
           id: initialData.id,
@@ -462,38 +457,14 @@ export function BlogForm({
             authorAvatarUrl: data.authorAvatarUrl,
           },
         })
-        apiSuccess = true
-      } catch (err: any) {
-        console.warn('Backend API update failed:', err)
-        const errorDetail = err?.response?.data?.detail || err?.message || 'Database update failed'
-        toast.error(`Database error: ${errorDetail}. Updated only in local cache.`)
-      }
-
-      updateBlog(initialData.id, {
-        title: data.title,
-        slug: data.slug,
-        excerpt: data.excerpt,
-        category: data.category,
-        readTime: data.readTime,
-        coverImage: data.coverImage,
-        featured: data.featured,
-        tags: tagsArray,
-        content: finalContent,
-        author: {
-          name: data.authorName,
-          role: data.authorRole,
-          avatarUrl: data.authorAvatarUrl,
-        },
-        sections: finalSections,
-      })
-
-      if (apiSuccess) {
         toast.success(`"${data.title}" updated successfully!`)
+        navigate({ to: '/manage-blogs' })
+      } catch (err) {
+        handleServerError(err)
       }
     } else {
-      let createdDoc: Blog | null = null
       try {
-        createdDoc = await createBlogMutation.mutateAsync({
+        await createBlogMutation.mutateAsync({
           title: data.title,
           slug: data.slug,
           excerpt: data.excerpt,
@@ -508,42 +479,12 @@ export function BlogForm({
           authorRole: data.authorRole,
           authorAvatarUrl: data.authorAvatarUrl,
         })
-      } catch (err: any) {
-        console.warn('Backend API create failed:', err)
-        const errorDetail = err?.response?.data?.detail || err?.message || 'Database save failed'
-        toast.error(`Database error: ${errorDetail}. Saved only to local browser cache.`)
-      }
-
-      addBlog({
-        ...(createdDoc?.id ? { id: createdDoc.id } : {}),
-        slug: createdDoc?.slug || data.slug,
-        title: data.title,
-        excerpt: data.excerpt,
-        category: data.category,
-        readTime: data.readTime,
-        publishedAt: new Date().toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric',
-        }),
-        coverImage: data.coverImage,
-        featured: data.featured,
-        tags: tagsArray,
-        content: finalContent,
-        author: {
-          name: data.authorName,
-          role: data.authorRole,
-          avatarUrl: data.authorAvatarUrl,
-        },
-        sections: finalSections,
-      })
-
-      if (createdDoc) {
         toast.success(`"${data.title}" created and saved to database!`)
+        navigate({ to: '/manage-blogs' })
+      } catch (err) {
+        handleServerError(err)
       }
     }
-
-    navigate({ to: '/manage-blogs' })
   }
 
   return (
@@ -1387,9 +1328,18 @@ export function BlogForm({
                     <Button variant='outline' asChild size='sm'>
                       <Link to='/manage-blogs'>Cancel</Link>
                     </Button>
-                    <Button type='submit' size='sm' className='gap-1.5'>
+                    <Button
+                      type='submit'
+                      size='sm'
+                      className='gap-1.5'
+                      disabled={createBlogMutation.isPending || updateBlogMutation.isPending}
+                    >
                       <Save className='h-3.5 w-3.5' />
-                      {isEdit ? 'Save Changes' : 'Publish Blog'}
+                      {createBlogMutation.isPending || updateBlogMutation.isPending
+                        ? 'Saving...'
+                        : isEdit
+                        ? 'Save Changes'
+                        : 'Publish Blog'}
                     </Button>
                   </div>
                 </CardFooter>

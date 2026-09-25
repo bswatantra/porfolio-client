@@ -18,6 +18,11 @@ import { routeTree } from './routeTree.gen'
 // Styles
 import './styles/index.css'
 
+// Clean up legacy local storage store if present
+if (typeof window !== 'undefined' && window.localStorage.getItem('portfolio_blogs_store')) {
+  window.localStorage.removeItem('portfolio_blogs_store')
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

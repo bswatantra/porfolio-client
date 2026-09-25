@@ -1,6 +1,5 @@
 export * from './types'
 export * from './api/blogs-api'
-export * from './data/blogs-store'
 export * from './schemas/blog-schema'
 export * from './utils/markdown-converter'
 export * from './components/markdown-renderer'

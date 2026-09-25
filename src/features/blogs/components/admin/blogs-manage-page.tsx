@@ -7,6 +7,7 @@ import {
   Edit3,
   ExternalLink,
   Eye,
+  Loader2,
   Plus,
   RotateCcw,
   Search,
@@ -15,6 +16,7 @@ import {
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { Header } from '@/components/layout/header'
+import { handleServerError } from '@/lib/handle-server-error'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -44,21 +46,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useBlogStore } from '../../data/blogs-store'
+import { useGetBlogsQuery, useSeedBlogsMutation } from '../../api/blogs-api'
 import type { Blog } from '../../types'
 import { BlogRowActions } from './blog-columns'
 import { BlogDeleteDialog } from './blog-delete-dialog'
 import { BlogPreviewDialog } from './blog-preview-dialog'
 
 export function BlogsManagePage() {
-  const blogs = useBlogStore((state) => state.blogs)
-  const resetToDefaults = useBlogStore((state) => state.resetToDefaults)
+  const { data: blogs = [], isLoading } = useGetBlogsQuery({
+    published_only: false,
+  })
+  const seedBlogsMutation = useSeedBlogsMutation()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('ALL')
   const [previewBlog, setPreviewBlog] = useState<Blog | null>(null)
   const [deleteBlog, setDeleteBlog] = useState<Blog | null>(null)
-  const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [showSeedConfirm, setShowSeedConfirm] = useState(false)
 
   // Get distinct categories
   const categories = useMemo(() => {
@@ -92,10 +96,14 @@ export function BlogsManagePage() {
     [blogs]
   )
 
-  const handleReset = () => {
-    resetToDefaults()
-    setShowResetConfirm(false)
-    toast.success('Reset blogs to default sample articles.')
+  const handleSeed = async () => {
+    try {
+      const res = await seedBlogsMutation.mutateAsync()
+      toast.success(res.message || 'Seeded sample engineering articles.')
+      setShowSeedConfirm(false)
+    } catch (err) {
+      handleServerError(err)
+    }
   }
 
   return (
@@ -130,10 +138,10 @@ export function BlogsManagePage() {
               variant='outline'
               size='sm'
               className='gap-1.5 text-xs text-muted-foreground'
-              onClick={() => setShowResetConfirm(true)}
+              onClick={() => setShowSeedConfirm(true)}
             >
               <RotateCcw className='h-3.5 w-3.5' />
-              Reset Defaults
+              Seed Defaults
             </Button>
 
             <Button asChild variant='outline' size='sm' className='gap-1.5 text-xs'>
@@ -251,7 +259,19 @@ export function BlogsManagePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredBlogs.length === 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className='h-40 text-center text-muted-foreground'
+                  >
+                    <div className='flex flex-col items-center justify-center gap-2'>
+                      <Loader2 className='h-8 w-8 animate-spin text-primary' />
+                      <p className='text-sm font-medium'>Loading articles from database...</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filteredBlogs.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={6}
@@ -261,7 +281,9 @@ export function BlogsManagePage() {
                       <BookOpen className='h-8 w-8 text-muted-foreground/40' />
                       <p className='text-sm font-medium'>No articles found</p>
                       <p className='text-xs text-muted-foreground'>
-                        Try adjusting your search query or category filter.
+                        {searchQuery || categoryFilter !== 'ALL'
+                          ? 'Try adjusting your search query or category filter.'
+                          : 'No articles currently in the database. Create a new post or seed samples.'}
                       </p>
                     </div>
                   </TableCell>
@@ -410,24 +432,23 @@ export function BlogsManagePage() {
         onOpenChange={(open) => !open && setDeleteBlog(null)}
       />
 
-      {/* Reset Confirmation Dialog */}
+      {/* Seed Confirmation Dialog */}
       <ConfirmDialog
-        open={showResetConfirm}
-        onOpenChange={setShowResetConfirm}
-        destructive
-        handleConfirm={handleReset}
+        open={showSeedConfirm}
+        onOpenChange={setShowSeedConfirm}
+        isLoading={seedBlogsMutation.isPending}
+        handleConfirm={handleSeed}
         className='max-w-md'
-        title='Reset Blogs to Defaults?'
+        title='Seed Default Blog Articles?'
         desc={
           <div className='space-y-2 text-sm text-muted-foreground'>
             <p>
-              This will reset the blog catalog back to the initial set of 5
-              engineering sample articles. Any custom blogs you have created will be
-              replaced.
+              This will populate your database with initial sample engineering
+              articles if the collection is empty.
             </p>
           </div>
         }
-        confirmText='Reset to Defaults'
+        confirmText='Seed Articles'
       />
     </>
   )

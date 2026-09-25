@@ -102,7 +102,7 @@ export function useGetBlogsQuery(params?: BlogFilterParams) {
   return useQuery({
     queryKey: ['blogs', params],
     queryFn: () => fetchBlogs(params),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds
   })
 }
 
@@ -111,7 +111,7 @@ export function useGetBlogQuery(idOrSlug: string | undefined) {
     queryKey: ['blogs', 'detail', idOrSlug],
     queryFn: () => fetchBlogByIdOrSlug(idOrSlug as string),
     enabled: Boolean(idOrSlug),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30, // 30 seconds
   })
 }
 
