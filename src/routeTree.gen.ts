@@ -21,6 +21,8 @@ import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
+import { Route as BlogsIndexRouteImport } from './routes/blogs/index'
+import { Route as BlogsBlogIdRouteImport } from './routes/blogs/$blogId'
 import { Route as ExperienceExperienceIdRouteImport } from './routes/experience/$experienceId'
 import { Route as ProjectProjectIdRouteImport } from './routes/project/$projectId'
 import { Route as AuthenticatedAboutIndexRouteImport } from './routes/_authenticated/about/index'
@@ -37,6 +39,9 @@ import { Route as AuthenticatedExperiencesNewRouteImport } from './routes/_authe
 import { Route as AuthenticatedHeroIndexRouteImport } from './routes/_authenticated/hero/index'
 import { Route as AuthenticatedHeroHeroIdRouteImport } from './routes/_authenticated/hero/$heroId'
 import { Route as AuthenticatedHeroNewRouteImport } from './routes/_authenticated/hero/new'
+import { Route as AuthenticatedManageBlogsIndexRouteImport } from './routes/_authenticated/manage-blogs/index'
+import { Route as AuthenticatedManageBlogsBlogIdRouteImport } from './routes/_authenticated/manage-blogs/$blogId'
+import { Route as AuthenticatedManageBlogsNewRouteImport } from './routes/_authenticated/manage-blogs/new'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects/$projectId'
 import { Route as AuthenticatedProjectsNewRouteImport } from './routes/_authenticated/projects/new'
@@ -107,6 +112,16 @@ const AuthenticatedSettingsRouteRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const BlogsIndexRoute = BlogsIndexRouteImport.update({
+  id: '/blogs/',
+  path: '/blogs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogsBlogIdRoute = BlogsBlogIdRouteImport.update({
+  id: '/blogs/$blogId',
+  path: '/blogs/$blogId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExperienceExperienceIdRoute = ExperienceExperienceIdRouteImport.update({
   id: '/experience/$experienceId',
   path: '/experience/$experienceId',
@@ -196,6 +211,24 @@ const AuthenticatedHeroNewRoute = AuthenticatedHeroNewRouteImport.update({
   path: '/hero/new',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedManageBlogsIndexRoute =
+  AuthenticatedManageBlogsIndexRouteImport.update({
+    id: '/manage-blogs/',
+    path: '/manage-blogs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedManageBlogsBlogIdRoute =
+  AuthenticatedManageBlogsBlogIdRouteImport.update({
+    id: '/manage-blogs/$blogId',
+    path: '/manage-blogs/$blogId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedManageBlogsNewRoute =
+  AuthenticatedManageBlogsNewRouteImport.update({
+    id: '/manage-blogs/new',
+    path: '/manage-blogs/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProjectsIndexRoute =
   AuthenticatedProjectsIndexRouteImport.update({
     id: '/projects/',
@@ -261,8 +294,10 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/blogs/$blogId': typeof BlogsBlogIdRoute
   '/experience/$experienceId': typeof ExperienceExperienceIdRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/blogs/': typeof BlogsIndexRoute
   '/about/$aboutId': typeof AuthenticatedAboutAboutIdRoute
   '/about/new': typeof AuthenticatedAboutNewRoute
   '/education/$educationId': typeof AuthenticatedEducationEducationIdRoute
@@ -272,6 +307,8 @@ export interface FileRoutesByFullPath {
   '/experiences/new': typeof AuthenticatedExperiencesNewRoute
   '/hero/$heroId': typeof AuthenticatedHeroHeroIdRoute
   '/hero/new': typeof AuthenticatedHeroNewRoute
+  '/manage-blogs/$blogId': typeof AuthenticatedManageBlogsBlogIdRoute
+  '/manage-blogs/new': typeof AuthenticatedManageBlogsNewRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/projects/new': typeof AuthenticatedProjectsNewRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -282,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/education/': typeof AuthenticatedEducationIndexRoute
   '/experiences/': typeof AuthenticatedExperiencesIndexRoute
   '/hero/': typeof AuthenticatedHeroIndexRoute
+  '/manage-blogs/': typeof AuthenticatedManageBlogsIndexRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/skills/': typeof AuthenticatedSkillsIndexRoute
@@ -298,8 +336,10 @@ export interface FileRoutesByTo {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/blogs/$blogId': typeof BlogsBlogIdRoute
   '/experience/$experienceId': typeof ExperienceExperienceIdRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/blogs': typeof BlogsIndexRoute
   '/about/$aboutId': typeof AuthenticatedAboutAboutIdRoute
   '/about/new': typeof AuthenticatedAboutNewRoute
   '/education/$educationId': typeof AuthenticatedEducationEducationIdRoute
@@ -309,6 +349,8 @@ export interface FileRoutesByTo {
   '/experiences/new': typeof AuthenticatedExperiencesNewRoute
   '/hero/$heroId': typeof AuthenticatedHeroHeroIdRoute
   '/hero/new': typeof AuthenticatedHeroNewRoute
+  '/manage-blogs/$blogId': typeof AuthenticatedManageBlogsBlogIdRoute
+  '/manage-blogs/new': typeof AuthenticatedManageBlogsNewRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/projects/new': typeof AuthenticatedProjectsNewRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -319,6 +361,7 @@ export interface FileRoutesByTo {
   '/education': typeof AuthenticatedEducationIndexRoute
   '/experiences': typeof AuthenticatedExperiencesIndexRoute
   '/hero': typeof AuthenticatedHeroIndexRoute
+  '/manage-blogs': typeof AuthenticatedManageBlogsIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/skills': typeof AuthenticatedSkillsIndexRoute
@@ -338,8 +381,10 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
+  '/blogs/$blogId': typeof BlogsBlogIdRoute
   '/experience/$experienceId': typeof ExperienceExperienceIdRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/blogs/': typeof BlogsIndexRoute
   '/_authenticated/about/$aboutId': typeof AuthenticatedAboutAboutIdRoute
   '/_authenticated/about/new': typeof AuthenticatedAboutNewRoute
   '/_authenticated/education/$educationId': typeof AuthenticatedEducationEducationIdRoute
@@ -349,6 +394,8 @@ export interface FileRoutesById {
   '/_authenticated/experiences/new': typeof AuthenticatedExperiencesNewRoute
   '/_authenticated/hero/$heroId': typeof AuthenticatedHeroHeroIdRoute
   '/_authenticated/hero/new': typeof AuthenticatedHeroNewRoute
+  '/_authenticated/manage-blogs/$blogId': typeof AuthenticatedManageBlogsBlogIdRoute
+  '/_authenticated/manage-blogs/new': typeof AuthenticatedManageBlogsNewRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/_authenticated/projects/new': typeof AuthenticatedProjectsNewRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -359,6 +406,7 @@ export interface FileRoutesById {
   '/_authenticated/education/': typeof AuthenticatedEducationIndexRoute
   '/_authenticated/experiences/': typeof AuthenticatedExperiencesIndexRoute
   '/_authenticated/hero/': typeof AuthenticatedHeroIndexRoute
+  '/_authenticated/manage-blogs/': typeof AuthenticatedManageBlogsIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/skills/': typeof AuthenticatedSkillsIndexRoute
@@ -378,8 +426,10 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/blogs/$blogId'
     | '/experience/$experienceId'
     | '/project/$projectId'
+    | '/blogs/'
     | '/about/$aboutId'
     | '/about/new'
     | '/education/$educationId'
@@ -389,6 +439,8 @@ export interface FileRouteTypes {
     | '/experiences/new'
     | '/hero/$heroId'
     | '/hero/new'
+    | '/manage-blogs/$blogId'
+    | '/manage-blogs/new'
     | '/projects/$projectId'
     | '/projects/new'
     | '/settings/account'
@@ -399,6 +451,7 @@ export interface FileRouteTypes {
     | '/education/'
     | '/experiences/'
     | '/hero/'
+    | '/manage-blogs/'
     | '/projects/'
     | '/settings/'
     | '/skills/'
@@ -415,8 +468,10 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/blogs/$blogId'
     | '/experience/$experienceId'
     | '/project/$projectId'
+    | '/blogs'
     | '/about/$aboutId'
     | '/about/new'
     | '/education/$educationId'
@@ -426,6 +481,8 @@ export interface FileRouteTypes {
     | '/experiences/new'
     | '/hero/$heroId'
     | '/hero/new'
+    | '/manage-blogs/$blogId'
+    | '/manage-blogs/new'
     | '/projects/$projectId'
     | '/projects/new'
     | '/settings/account'
@@ -436,6 +493,7 @@ export interface FileRouteTypes {
     | '/education'
     | '/experiences'
     | '/hero'
+    | '/manage-blogs'
     | '/projects'
     | '/settings'
     | '/skills'
@@ -454,8 +512,10 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
+    | '/blogs/$blogId'
     | '/experience/$experienceId'
     | '/project/$projectId'
+    | '/blogs/'
     | '/_authenticated/about/$aboutId'
     | '/_authenticated/about/new'
     | '/_authenticated/education/$educationId'
@@ -465,6 +525,8 @@ export interface FileRouteTypes {
     | '/_authenticated/experiences/new'
     | '/_authenticated/hero/$heroId'
     | '/_authenticated/hero/new'
+    | '/_authenticated/manage-blogs/$blogId'
+    | '/_authenticated/manage-blogs/new'
     | '/_authenticated/projects/$projectId'
     | '/_authenticated/projects/new'
     | '/_authenticated/settings/account'
@@ -475,6 +537,7 @@ export interface FileRouteTypes {
     | '/_authenticated/education/'
     | '/_authenticated/experiences/'
     | '/_authenticated/hero/'
+    | '/_authenticated/manage-blogs/'
     | '/_authenticated/projects/'
     | '/_authenticated/settings/'
     | '/_authenticated/skills/'
@@ -493,8 +556,10 @@ export interface RootRouteChildren {
   errors404Route: typeof errors404Route
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
+  BlogsBlogIdRoute: typeof BlogsBlogIdRoute
   ExperienceExperienceIdRoute: typeof ExperienceExperienceIdRoute
   ProjectProjectIdRoute: typeof ProjectProjectIdRoute
+  BlogsIndexRoute: typeof BlogsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -582,6 +647,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/blogs/': {
+      id: '/blogs/'
+      path: '/blogs'
+      fullPath: '/blogs/'
+      preLoaderRoute: typeof BlogsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blogs/$blogId': {
+      id: '/blogs/$blogId'
+      path: '/blogs/$blogId'
+      fullPath: '/blogs/$blogId'
+      preLoaderRoute: typeof BlogsBlogIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/experience/$experienceId': {
       id: '/experience/$experienceId'
@@ -695,6 +774,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHeroNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/manage-blogs/': {
+      id: '/_authenticated/manage-blogs/'
+      path: '/manage-blogs'
+      fullPath: '/manage-blogs/'
+      preLoaderRoute: typeof AuthenticatedManageBlogsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/manage-blogs/$blogId': {
+      id: '/_authenticated/manage-blogs/$blogId'
+      path: '/manage-blogs/$blogId'
+      fullPath: '/manage-blogs/$blogId'
+      preLoaderRoute: typeof AuthenticatedManageBlogsBlogIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/manage-blogs/new': {
+      id: '/_authenticated/manage-blogs/new'
+      path: '/manage-blogs/new'
+      fullPath: '/manage-blogs/new'
+      preLoaderRoute: typeof AuthenticatedManageBlogsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/projects/': {
       id: '/_authenticated/projects/'
       path: '/projects'
@@ -788,6 +888,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedExperiencesNewRoute: typeof AuthenticatedExperiencesNewRoute
   AuthenticatedHeroHeroIdRoute: typeof AuthenticatedHeroHeroIdRoute
   AuthenticatedHeroNewRoute: typeof AuthenticatedHeroNewRoute
+  AuthenticatedManageBlogsBlogIdRoute: typeof AuthenticatedManageBlogsBlogIdRoute
+  AuthenticatedManageBlogsNewRoute: typeof AuthenticatedManageBlogsNewRoute
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
   AuthenticatedProjectsNewRoute: typeof AuthenticatedProjectsNewRoute
   AuthenticatedSkillsSkillIdRoute: typeof AuthenticatedSkillsSkillIdRoute
@@ -797,6 +899,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEducationIndexRoute: typeof AuthenticatedEducationIndexRoute
   AuthenticatedExperiencesIndexRoute: typeof AuthenticatedExperiencesIndexRoute
   AuthenticatedHeroIndexRoute: typeof AuthenticatedHeroIndexRoute
+  AuthenticatedManageBlogsIndexRoute: typeof AuthenticatedManageBlogsIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
   AuthenticatedSkillsIndexRoute: typeof AuthenticatedSkillsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
@@ -815,6 +918,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedExperiencesNewRoute: AuthenticatedExperiencesNewRoute,
   AuthenticatedHeroHeroIdRoute: AuthenticatedHeroHeroIdRoute,
   AuthenticatedHeroNewRoute: AuthenticatedHeroNewRoute,
+  AuthenticatedManageBlogsBlogIdRoute: AuthenticatedManageBlogsBlogIdRoute,
+  AuthenticatedManageBlogsNewRoute: AuthenticatedManageBlogsNewRoute,
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
   AuthenticatedProjectsNewRoute: AuthenticatedProjectsNewRoute,
   AuthenticatedSkillsSkillIdRoute: AuthenticatedSkillsSkillIdRoute,
@@ -824,6 +929,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEducationIndexRoute: AuthenticatedEducationIndexRoute,
   AuthenticatedExperiencesIndexRoute: AuthenticatedExperiencesIndexRoute,
   AuthenticatedHeroIndexRoute: AuthenticatedHeroIndexRoute,
+  AuthenticatedManageBlogsIndexRoute: AuthenticatedManageBlogsIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
   AuthenticatedSkillsIndexRoute: AuthenticatedSkillsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
@@ -844,8 +950,10 @@ const rootRouteChildren: RootRouteChildren = {
   errors404Route: errors404Route,
   errors500Route: errors500Route,
   errors503Route: errors503Route,
+  BlogsBlogIdRoute: BlogsBlogIdRoute,
   ExperienceExperienceIdRoute: ExperienceExperienceIdRoute,
   ProjectProjectIdRoute: ProjectProjectIdRoute,
+  BlogsIndexRoute: BlogsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

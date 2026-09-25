@@ -8,6 +8,7 @@ import {
   GalleryVerticalEnd,
   UserCheck,
   Zap,
+  BookOpen,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -77,6 +78,11 @@ export const sidebarData: SidebarData = {
           title: 'Education',
           url: '/education',
           icon: GraduationCap,
+        },
+        {
+          title: 'Blogs',
+          url: '/manage-blogs',
+          icon: BookOpen,
         },
       ],
     },

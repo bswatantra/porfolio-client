@@ -320,12 +320,21 @@ export function PortfolioNavbar({
               {s}
             </a>
           ))}
+          <Link
+            to='/blogs'
+            className='rounded-md px-3 py-1.5 text-sm font-medium text-primary/90 transition-all hover:bg-accent hover:text-primary'
+          >
+            Blogs
+          </Link>
         </nav>
 
         {/* Right actions */}
         <div className='flex items-center gap-2'>
+          <Button asChild size='sm' variant='ghost' className='text-xs md:hidden'>
+            <Link to='/blogs'>Blogs</Link>
+          </Button>
           <ThemeSwitch />
-          <Button asChild size='sm' variant='outline' className='hidden gap-1.5projects sm:flex'>
+          <Button asChild size='sm' variant='outline' className='hidden gap-1.5 sm:flex'>
             <Link to='/sign-in'>
               <Shield className='h-3.5 w-3.5' />
               Admin
