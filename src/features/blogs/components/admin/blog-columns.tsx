@@ -38,7 +38,12 @@ export function BlogRowActions({
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' size='icon' className='h-8 w-8 p-0'>
+        <Button
+          variant='ghost'
+          size='icon'
+          className='h-8 w-8 p-0'
+          aria-label={`Actions for ${blog.title}`}
+        >
           <MoreHorizontal className='h-4 w-4' />
           <span className='sr-only'>Open menu</span>
         </Button>

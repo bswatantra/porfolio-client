@@ -1,4 +1,5 @@
-import { ExternalLink } from 'lucide-react'
+import { lazy, Suspense } from 'react'
+import { ExternalLink, Loader2 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,8 +11,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { BlogDetail } from '../blog-detail'
 import type { Blog } from '../../types'
+
+const LazyBlogDetail = lazy(() =>
+  import('../blog-detail').then((m) => ({ default: m.BlogDetail }))
+)
 
 interface BlogPreviewDialogProps {
   blog: Blog | null
@@ -59,7 +63,15 @@ export function BlogPreviewDialog({
         </DialogDescription>
 
         <ScrollArea className='max-h-[calc(92vh-60px)] px-6 py-4'>
-          <BlogDetail blog={blog} isPreview />
+          <Suspense
+            fallback={
+              <div className='flex items-center justify-center py-16 text-muted-foreground'>
+                <Loader2 className='h-6 w-6 animate-spin' />
+              </div>
+            }
+          >
+            <LazyBlogDetail blog={blog} isPreview />
+          </Suspense>
         </ScrollArea>
       </DialogContent>
     </Dialog>

@@ -383,9 +383,11 @@ export function BlogsManagePage() {
                           size='icon'
                           className='h-8 w-8 text-muted-foreground hover:text-primary'
                           title='Preview Article'
+                          aria-label={`Preview "${blog.title}"`}
                           onClick={() => setPreviewBlog(blog)}
                         >
                           <Eye className='h-4 w-4' />
+                          <span className='sr-only'>Preview Article</span>
                         </Button>
 
                         <Button
@@ -394,12 +396,14 @@ export function BlogsManagePage() {
                           size='icon'
                           className='h-8 w-8 text-muted-foreground hover:text-foreground'
                           title='Edit Article'
+                          aria-label={`Edit "${blog.title}"`}
                         >
                           <Link
                             to='/manage-blogs/$blogId'
                             params={{ blogId: blog.id }}
                           >
                             <Edit3 className='h-4 w-4' />
+                            <span className='sr-only'>Edit Article</span>
                           </Link>
                         </Button>
 
@@ -419,18 +423,22 @@ export function BlogsManagePage() {
       </Main>
 
       {/* Preview Dialog */}
-      <BlogPreviewDialog
-        blog={previewBlog}
-        open={!!previewBlog}
-        onOpenChange={(open) => !open && setPreviewBlog(null)}
-      />
+      {previewBlog && (
+        <BlogPreviewDialog
+          blog={previewBlog}
+          open={!!previewBlog}
+          onOpenChange={(open) => !open && setPreviewBlog(null)}
+        />
+      )}
 
       {/* Delete Dialog */}
-      <BlogDeleteDialog
-        blog={deleteBlog}
-        open={!!deleteBlog}
-        onOpenChange={(open) => !open && setDeleteBlog(null)}
-      />
+      {deleteBlog && (
+        <BlogDeleteDialog
+          blog={deleteBlog}
+          open={!!deleteBlog}
+          onOpenChange={(open) => !open && setDeleteBlog(null)}
+        />
+      )}
 
       {/* Seed Confirmation Dialog */}
       <ConfirmDialog

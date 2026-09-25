@@ -524,7 +524,9 @@ function SidebarMenuButton({
     />
   )
 
-  if (!tooltip) {
+  // If there is no tooltip, or if the sidebar is expanded (or on mobile) where tooltips are hidden anyway,
+  // return the button directly to prevent wrapping navigation links in heavy Radix Tooltip event interceptors.
+  if (!tooltip || state !== 'collapsed' || isMobile) {
     return button
   }
 

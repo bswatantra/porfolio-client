@@ -716,7 +716,7 @@ export function BlogForm({
                             defaultValue={field.value}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger aria-label='Select category'>
                                 <SelectValue placeholder='Select category' />
                               </SelectTrigger>
                             </FormControl>
@@ -756,12 +756,17 @@ export function BlogForm({
                       <FormItem className='flex flex-row items-center space-x-3 space-y-0 rounded-lg border p-3.5'>
                         <FormControl>
                           <Checkbox
+                            id='featured-article-checkbox'
+                            aria-label='Feature this article'
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
                         </FormControl>
                         <div className='space-y-0.5 leading-none'>
-                          <FormLabel className='cursor-pointer text-sm font-semibold'>
+                          <FormLabel
+                            htmlFor='featured-article-checkbox'
+                            className='cursor-pointer text-sm font-semibold'
+                          >
                             Feature this article
                           </FormLabel>
                           <FormDescription className='text-xs'>
@@ -916,8 +921,10 @@ export function BlogForm({
                                       size='icon'
                                       className='h-7 w-7 text-destructive hover:bg-destructive/10'
                                       onClick={() => field.onChange('')}
+                                      aria-label='Remove cover image'
                                     >
                                       <X className='h-4 w-4' />
+                                      <span className='sr-only'>Remove cover image</span>
                                     </Button>
                                   </div>
                                 </div>
